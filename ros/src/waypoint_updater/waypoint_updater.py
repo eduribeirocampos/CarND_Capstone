@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
+import numpy as np
 import rospy
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
+from scipy.spatial import KDTree
+from std_msgs.msg import Int32
 
 import math
 
@@ -21,8 +24,9 @@ as well as to verify your TL classifier.
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
-LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-
+LOOKAHEAD_WPS = 100 # Number of waypoints we will publish. You can change this number
+speed_M_p = 30
+speed_M_s = speed_M_p * 0.44704
 
 class WaypointUpdater(object):
     def __init__(self):
@@ -31,29 +35,82 @@ class WaypointUpdater(object):
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
-        # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
-
+        #Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
+        rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
+        #rospy.Subscriber ( 'obstacle_waypoint', Int32, self.obstacle_cb, queue_size=1 )
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
-        # TODO: Add other member variables you need below
+        # Other member variables needed. Project Implementation
+        self.pose = None
+        self.base_waypoints = None       
+        self.waypoints_2d = None  
+        self.waypoint_tree = None
+ 
+        self.loop()
+        #rospy.spin()
 
-        rospy.spin()
+    # Project Implementation ( support code - udacity classroom )
+    def loop(self):
+        rate = rospy.Rate(15)
+        while not rospy.is_shutdown():
+            if self.pose and self.base_waypoints and self.waypoint_tree:
+                #get closest waypoint
+                closest_waypoint_idx = self.get_closest_waypoint_idx()
+                self.publish_waypoints(closest_waypoint_idx)
+            rate.sleep()
+  
+    #Project Implementation ( support code - udacity classroom )
+    def get_closest_waypoint_idx(self):
+        x = self.pose.pose.position.x
+        y = self.pose.pose.position.y
+        closest_idx = self.waypoint_tree.query([x,y], 1)[1]
 
+        #Check if closest is ahead or behind vehicle
+        closest_coord = self.waypoints_2d[closest_idx]
+        prev_coord = self.waypoints_2d[closest_idx-1]
+
+        #Equation for hiperplane through closest_coords
+        cl_vect = np.array(closest_coord)
+        prev_vect = np.array(prev_coord)
+        pos_vect = np.array([x,y])
+        
+        val = np.dot(cl_vect-prev_vect, pos_vect-cl_vect)
+
+        if val> 0:
+            closest_idx = (closest_idx +1) % len(self.waypoints_2d)
+
+        return closest_idx
+
+    # Project Implementation ( support code - udacity classroom )
+    def publish_waypoints(self,closest_idx): # Project Implementation
+        lane = Lane()
+        lane.header=self.base_waypoints.header
+        lane.waypoints=self.base_waypoints.waypoints[closest_idx:closest_idx + LOOKAHEAD_WPS]
+        self.final_waypoints_pub.publish(lane) 
+
+
+    # Project Implementation ( support code - udacity classroom )
     def pose_cb(self, msg):
-        # TODO: Implement
-        pass
+        self.pose = msg
+        #pass
 
-    def waypoints_cb(self, waypoints):
-        # TODO: Implement
-        pass
+
+    def waypoints_cb(self, waypoints):      
+        self.base_waypoints = waypoints
+        if not self.waypoints_2d:
+            self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
+            self.waypoint_tree = waypoint_tree = KDTree(self.waypoints_2d)
+            for i in range(len(self.base_waypoints.waypoints)):
+                self.set_waypoint_velocity(self.base_waypoints.waypoints, i, speed_M_s)        
 
     def traffic_cb(self, msg):
-        # TODO: Callback for /traffic_waypoint message. Implement
+        #Callback for /traffic_waypoint message. Project Implementation
+        self.traffic_waypoint = msg.data
         pass
 
     def obstacle_cb(self, msg):
-        # TODO: Callback for /obstacle_waypoint message. We will implement it later
+        #Callback for /obstacle_waypoint message. We will implement it later
         pass
 
     def get_waypoint_velocity(self, waypoint):
