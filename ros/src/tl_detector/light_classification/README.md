@@ -3,7 +3,7 @@
 
 This section was created using this [repository](https://github.com/smasoudn/traffic_light_detection/blob/master/create_udacity_tf_record.py) as reference:
 
-The [tf_record.py](./tf_record.py) file `was modified` in order to fix deprecated code lines.**
+**The [tf_record.py](./tf_record.py) file `was modified` in order to fix deprecated code lines.**
 
 **To be considered:**
 
