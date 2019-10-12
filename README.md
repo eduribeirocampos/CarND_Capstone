@@ -1,92 +1,71 @@
-test
+# Traffic Light Detection.
+[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
-This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
+This section was created using this [repository](https://github.com/smasoudn/traffic_light_detection/blob/master/create_udacity_tf_record.py) as reference:
 
-Please use **one** of the two installation options, either native **or** docker installation.
+The [tf_record.py](./tf_record.py) file `was modified` in order to fix deprecated code lines.**
 
-### Native Installation
+**To be considered:**
 
-* Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop).
-* If using a Virtual Machine to install Ubuntu, use the following configuration as minimum:
-  * 2 CPU
-  * 2 GB system memory
-  * 25 GB of free hard drive space
+### 1. Downloads :
 
-  The Udacity provided virtual machine has ROS and Dataspeed DBW already installed, so you can skip the next two steps if you are using this.
+The itens where is nessary download files ( e.g. itens 2,6,etc) are not availabe in this repository, You must download from the links availables [here](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg) in order to run locally.
 
-* Follow these instructions to install ROS
-  * [ROS Kinetic](http://wiki.ros.org/kinetic/Installation/Ubuntu) if you have Ubuntu 16.04.
-  * [ROS Indigo](http://wiki.ros.org/indigo/Installation/Ubuntu) if you have Ubuntu 14.04.
-* [Dataspeed DBW](https://bitbucket.org/DataspeedInc/dbw_mkz_ros)
-  * Use this option to install the SDK on a workstation that already has ROS installed: [One Line SDK Install (binary)](https://bitbucket.org/DataspeedInc/dbw_mkz_ros/src/81e63fcc335d7b64139d7482017d6a97b405e250/ROS_SETUP.md?fileviewer=file-view-default)
-* Download the [Udacity Simulator](https://github.com/udacity/CarND-Capstone/releases).
+### 2. record files:
 
-### Docker Installation
-[Install Docker](https://docs.docker.com/engine/installation/)
+Below the item 5 runned locally and the .record files generated.
 
-Build the docker container
-```bash
-docker build . -t capstone
-```
+<p align="center">
+  <img src="images/record files.jpg">
+</p>
 
-Run the docker file
-```bash
-docker run -p 4567:4567 -v $PWD:/capstone -v /tmp/log:/root/.ros/ --rm -it capstone
-```
+For details about the process, individual information is here: [real](./images/real_record.jpg) and "[simulator](./images/sim_record.jpg)
 
-### Port Forwarding
-To set up port forwarding, please refer to the "uWebSocketIO Starter Guide" found in the classroom (see Extended Kalman Filter Project lesson).
+### 3. Pretrained Model:
 
-### Usage
+It was chosen the [ssd_mobilenet_V2_coco](http://download.tensorflow.org/models/object_detection/ssd_mobilenet_v2_coco_2018_03_29.tar.gz).The main reason is the performance about how faster this module runs compared with others.
 
-1. Clone the project repository
-```bash
-git clone https://github.com/udacity/CarND-Capstone.git
-```
+### 4. Config file:
 
-2. Install python dependencies
-```bash
-cd CarND-Capstone
-pip install -r requirements.txt
-```
-3. Make and run styx
-```bash
-cd ros
-catkin_make
-source devel/setup.sh
-roslaunch launch/styx.launch
-```
-4. Run the simulator
+Here is the link for [ssd_mobilenet_v2_coco.config](https://github.com/tensorflow/models/blob/master/research/object_detection/samples/configs/ssd_mobilenet_v2_coco.config) file.
 
-### Real world testing
-1. Download [training bag](https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/traffic_light_bag_file.zip) that was recorded on the Udacity self-driving car.
-2. Unzip the file
-```bash
-unzip traffic_light_bag_file.zip
-```
-3. Play the bag file
-```bash
-rosbag play -l traffic_light_bag_file/traffic_light_training.bag
-```
-4. Launch your project in site mode
-```bash
-cd CarND-Capstone/ros
-roslaunch launch/site.launch
-```
-5. Confirm that traffic light detection works on real life images
+The `fine_tune_checkpoint` are:
 
-### Other library/driver information
-Outside of `requirements.txt`, here is information on other driver/library versions used in the simulator and Carla:
+- line 9: Modified value from 90 to 4.
+- line 41: Inserted line "reduce_boxes_in_lowest_layer: true".
+- line 134: Modified value from 100 to 50. 
+- line 135: Modified value from 100 to 50. 
+- line 164: Modified value from 200000 to 10000. 
+- line 177: Inserted path to .record file.
+- line 179: Inserted path to .pbtxt file
 
-Specific to these libraries, the simulator grader and Carla use the following:
+- Commented lines from 182 to 196.
 
-|        | Simulator | Carla  |
-| :-----------: |:-------------:| :-----:|
-| Nvidia driver | 384.130 | 384.130 |
-| CUDA | 8.0.61 | 8.0.61 |
-| cuDNN | 6.0.21 | 6.0.21 |
-| TensorRT | N/A | N/A |
-| OpenCV | 3.2.0-dev | 2.4.8 |
-| OpenMP | N/A | N/A |
+It was created 2 .config file, the diference is the path for the .record file at line 177, more detail could be checked here [real](./training/Real/ssd_mobilenet_v2_coco.config) and [Simulator](./training/Simulator/ssd_mobilenet_v2_coco.config).<br/>
+PS: The file name is the same.
 
-We are working on a fix to line up the OpenCV versions between the two.
+### 5. pbtxt file:
+
+The File contain the id number associated to a traffic light color:
+
+- id 1: Green.
+- id 2: Red.
+- id 3: Yellow.
+- id 4: Unknown.
+
+For more detail, please check the [label_map.pbtxt](./training/label_map.pbtxt) file.
+
+### 6. Training the model. 
+
+this command line used in `tensorflow models/research/`
+
+- For Real:<br/>
+`
+python train.py  --logtostderr --train_dir=training/ --pipeline_config_path=training/Real/ssd_inception_v2_coco.config
+`
+
+- For Simulator:<br/>
+
+`
+python3 train.py  --logtostderr --train_dir=training/ --pipeline_config_path=training/Simulator/ssd_inception_v2_coco.config
+`
