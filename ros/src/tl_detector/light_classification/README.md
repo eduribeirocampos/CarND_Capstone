@@ -60,12 +60,12 @@ For more detail, please check the [label_map.pbtxt](./training/label_map.pbtxt) 
 this command line used in `tensorflow models/research/`
 
 - For Real:<br/>
-`
+```
 python train.py  --logtostderr --train_dir=training/ --pipeline_config_path=training/Real/ssd_inception_v2_coco.config
-`
+```
 
 - For Simulator:<br/>
 
-`
+```
 python3 train.py  --logtostderr --train_dir=training/ --pipeline_config_path=training/Simulator/ssd_inception_v2_coco.config
-`
+```
