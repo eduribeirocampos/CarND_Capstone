@@ -12,9 +12,9 @@ class Controller(object):
     def __init__(self, vehicle_mass, fuel_capacity,brake_deadband, decel_limit,
                   accel_limit,wheel_radius,wheel_base,steer_ratio, max_lat_accel, max_steer_angle):
         self.yaw_controller = YawController(wheel_base, steer_ratio,0.1, max_lat_accel, max_steer_angle)
-        kp = 0.3
-        ki = 0.1
-        kd = 0.
+        kp = 0.5
+        ki = 0.0001
+        kd = 0.05
         mn = 0. #minimum throttle value
         mx = 0.2 #maximum throttle value
         self.throttle_controller = PID(kp, ki , kd , mn , mx)
@@ -31,10 +31,11 @@ class Controller(object):
         self.wheel_radius = wheel_radius
 
         self.last_time = rospy.get_time()
-        
+
+   
         
     # Project Implementation ( support code - udacity classroom )
-    def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
+    def control(self, current_vel, current_angular_vel , dbw_enabled , linear_vel, angular_vel):
         # 
         if not dbw_enabled:
             self.throttle_controller.reset()
