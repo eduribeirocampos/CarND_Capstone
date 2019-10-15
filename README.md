@@ -194,3 +194,10 @@ Specific to these libraries, the simulator grader and Carla use the following:
 | OpenMP | N/A | N/A |
 
 We are working on a fix to line up the OpenCV versions between the two.
+
+--------------------------------------------------
+### Gratitude
+----------------------------------------------------
+
+1. For all professionals and users from the strong community, that have provided alternative solutions for so many issues that  we face on the projects.</br>
+2. Many thanks to [Arjun D](https://github.com/ArjunDeshmukh) , Great teammate, and student from Udacity. 
